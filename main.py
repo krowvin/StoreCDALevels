@@ -13,7 +13,7 @@ HEADERS = {
 
 ELEV_CONS = ".Elev.Inst.0.Top of Conservation"
 
-PROJECTS = ["KEYS"]
+PROJECTS = ["ALTU", "KEYS"]
 
 
 def getLevelData(LID: str, office: str):
@@ -46,12 +46,25 @@ def getLevelData(LID: str, office: str):
     #    print(f"Failed to get level data for {LID}: Error - ", err)
     #    return [None, None]
 
+# Save Project Level Data to a JSON file
+
+
+def save(data, filename="location_levels.json"):
+    if not filename.endswith(".json"): raise ValueError("Invalid File Type! Must be type JSON")
+    WIN_DIR = os.path.join(WEB_DIR, filename)
+    with open(WIN_DIR, "w") as pf:
+        json.dump(data, pf)
+    print(f"\t\tSaved: {WIN_DIR}")
+
 
 def main():
     # Start Here
+    output_data = {}
+    # Loop our projects and pull their data from CDA
     for proj in PROJECTS:
-        date, value = getLevelData(proj + ELEV_CONS, "SWT")
-        print(date, value)
-
+        print(f"Fetching Location Level Data for {proj}")
+        output_data[proj] = getLevelData(proj + ELEV_CONS, "SWT")
+    # Store all data in one global JSON file
+    save(output_data, "location_levels.json")
 if __name__ == "__main__":
     main()
